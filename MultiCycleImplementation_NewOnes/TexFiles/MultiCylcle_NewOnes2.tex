@@ -1,0 +1,346 @@
+\documentclass{standalone}
+\usepackage[siunitx, RPvoltages]{circuitikz}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, angles, quotes}
+\usetikzlibrary{positioning}
+\usepackage{graphicx}
+
+
+
+\tikzset{flipflop myLatchI/.style={
+    flipflop,
+    scale=0.5,
+    flipflop def={t2=I, cu=1, t5=O, td=\tiny{latch}}
+}}
+
+\tikzset{flipflop myLatch/.style={
+    flipflop,
+    scale=0.5,
+    flipflop def={t2=I, cd=1, t5=O, tu=\tiny{latch}}
+}}
+
+\tikzset{flipflop myLatchNoen/.style={
+    flipflop,
+    scale=0.35,
+    flipflop def={t2=I, cd=1, t5=O}
+}}
+
+\tikzset{flipflop myMemory/.style={
+    flipflop,    
+    flipflop def={t1=\tiny{Addr}, cd=1, t6=\tiny{RD}, t3=\tiny{WD}, tu=\tiny{WEN}}
+}}
+
+\tikzset{muxdemux mux2x1/.style={
+    muxdemux,
+    muxdemux def={Lh=2, NL=2, NB=0, NT=1, Rh=1, NR=1, w=1, square pins=1}    
+}}
+
+\tikzset{muxdemux mux4x1/.style={
+    muxdemux,
+    muxdemux def={Lh=2, NL=4, NB=0, NT=1, Rh=1, NR=1, w=1, square pins=1}
+}}
+    
+\tikzset{
+    mySignExp/.pic ={
+    \coordinate (-in) at (0,0.25);
+    \coordinate (-out) at (2.5, 0.5);
+    \draw[pic actions] (0,0) -- ++(0,0.5) -- ++(2.5,0.6) -- ++(0,-1.1) --cycle;
+    \draw[pic actions] (-out) -- ([xshift=10.5]-out);
+    \draw[pic actions] ([xshift=-10.5]-in) -- (-in);
+
+    \node at (1.25,0.35) {\tiny Sign Extension};
+    \node{ \tikzpictext};
+  }
+}
+
+
+\tikzset{muxdemux myALU/.style=
+{
+    muxdemux,
+    muxdemux def={Lh=5, NL=2, Rh=2, NR=1, NB=1, NT=1, w=2,
+    inset w=1, inset Lh=2, inset Rh=0, square pins=1}
+    }
+}
+
+\begin{document}
+
+\begin{circuitikz}
+
+    \ctikzset{multipoles/thickness=3}
+    \ctikzset{multipoles/dipchip/width=2}
+
+    \node[flipflop myLatchI] at (0,0) (PCFF) {PC};
+    \node[above=1mm] at (PCFF.north) {\tiny{CLK}};
+
+    \node[muxdemux mux2x1] at ([xshift=6em,yshift=-8pt]PCFF) (Mux1) {};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux1.lpin 1) {0};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux1.lpin 2) {1};
+
+    \draw (PCFF.pin 5) to (Mux1.lpin 1);
+    \node[magenta] at ([xshift=1.4em,yshift=-0.5em]PCFF.pin 5) {\tiny{currentPC}};
+
+    \node[flipflop myMemory, text width=1cm] at ([xshift=10em, yshift=-3.2em]PCFF) (Memory) {\tiny{\textbf{Memory}}};
+    \node[below=2mm] at (Memory.south) {\tiny{CLK}};
+
+    \draw (Mux1.rpin 1) to (Memory.pin 1);
+
+    \node[flipflop myLatch] at (15em, -8pt) (IRFF) {IR};
+    \node[below=1mm] at (IRFF.south) {\tiny{CLK}};
+    \node[magenta] at ([xshift=2.5em,yshift=0.5em]IRFF.pin 5) {\tiny{currentInstruction}};
+
+
+
+    \draw (Memory.pin 6) to (IRFF.pin 2);
+
+
+
+
+
+    % register file strats
+    \draw (0,0) node[dipchip,
+        scale =1,
+        num pins=12, hide numbers, no topmark,
+        external pins width=0] at ([xshift=35em,yshift=-5em]PCFF) (RF){\small Register File};
+
+    \node [right, font=\tiny] at (RF.bpin 1) {RD\_addr1};
+    \node [right, font=\tiny] at (RF.bpin 2) {RD\_addr2};
+    \node [right, font=\tiny] at (RF.bpin 4) {WR\_addr3};
+    \draw (RF.bpin 1) -- ++(-0.5,0) coordinate(extpin1);
+    \draw (RF.bpin 2) -- ++(-0.5,0) coordinate(extpin2);
+    \draw (RF.bpin 4) -- ++(-0.5,0) coordinate(extpin3);
+    \draw (RF.bpin 5) -- ++(-0.3,0) coordinate(extpin4);
+    \draw (RF.bpin 6) -- ++(-0.5,0) coordinate(extpin5);
+
+    \draw (RF.bpin 5) ++(0,0.1) -- ++(0.1,-0.1)
+    node[left=3mm, font=\tiny]{CLK} -- ++(-0.1,-0.1);
+    \node [right, font=\tiny] at (RF.bpin 6) {WR\_data};
+
+    \draw (RF.n) -- ++(0,0.5) node[below, pos=0] {\tiny{EN}};
+
+    \node [left, font=\tiny] at (RF.bpin 12) {RD\_data1};
+    \node [left, font=\tiny] at (RF.bpin 11) {RD\_data2};
+
+    \draw (RF.bpin 12) -- ++(0.5,0) coordinate(extpin6);
+    \draw (RF.bpin 11) -- ++(0.5,0) coordinate(extpin7);
+    % register file ends
+
+
+
+    \node[muxdemux mux2x1] at ([xshift=-6em]extpin3) (Mux2) {};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux2.lpin 1) {0};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux2.lpin 2) {1};
+
+    \draw (Mux2.rpin 1) to (extpin3);
+
+
+    \node[muxdemux mux2x1] at ([xshift=-4em]extpin5) (Mux3) {};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux3.lpin 1) {1};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux3.lpin 2) {0};
+
+    \draw (Mux3.rpin 1) to (extpin5);
+
+    % \node[magenta] at ([xshift=2.5em,yshift=0.5em]IRFF.pin 5) {\tiny{currentInstruction}};
+
+    \draw (IRFF.bpin 5) -- ++ (5.8em,0) |- (extpin1) node[above,magenta]  {\tiny{[25:21]}};
+    \draw (IRFF.bpin 5) -- ++ (5.8em,0) |- (extpin2) node[above,magenta]  {\tiny{[20:16]}};
+
+    \draw (IRFF.bpin 5) -- ++ (5.8em,0) |- (Mux2.lpin 1) node[left=2mm, above,magenta]  {\tiny{[20:16]}};
+    \draw (IRFF.bpin 5) -- ++ (5.8em,0) |- (Mux2.lpin 2) node[left=2mm, above, magenta]  {\tiny{[15:11]}};
+
+    \draw (Memory.bpin 6) -- ++ (1em,0) |- (Mux3.lpin 1) node[ above,pos=0.7, magenta]  {\tiny{Data}};
+
+
+    \pic[] (SE) at ([xshift=-2.5em,yshift=-10em]RF) {mySignExp} ;
+    \draw (IRFF.bpin 5) -- ++ (5.8em,0) |- (SE-in) node[left=4mm, above,magenta]  {\tiny{[15:0]}};
+
+
+    \node[flipflop myLatchNoen] (Aout) at ([xshift=0.5em]extpin6) {};
+    \node[below=1mm] at (Aout.south) {\tiny{CLK}};
+    \node[flipflop myLatchNoen] (Bout) at ([xshift=2.5em]extpin7) {};
+    \node[below=1mm] at (Bout.south) {\tiny{CLK}};
+    \draw (RF.bpin 12) -- (Aout.bpin 2);
+    \draw (RF.bpin 11) -- (Bout.bpin 2);
+
+
+    \node[muxdemux mux4x1] at ([xshift=7em,yshift=0.8em]Aout) (Mux4) {};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux4.lpin 1) {00};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux4.lpin 2) {10};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux4.lpin 3) {01};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux4.lpin 4) {11};
+
+    \draw (Aout.bpin 5) node[above right=1mm,magenta]  {\tiny{Aout}} -- ++ (1em,0) |- (Mux4.lpin 3) ;
+
+
+    \node[muxdemux mux4x1] at ([xshift=8em,yshift=-2.8em]Aout) (Mux5) {};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux5.lpin 1) {00};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux5.lpin 2) {01};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux5.lpin 3) {10};
+    \node[right, font=\tiny] at ([xshift=0.5em]Mux5.lpin 4) {11};
+
+    \draw (Bout.bpin 5) node[right=4mm, above,magenta]  {\tiny{Bout}} -- (Mux5.lpin 1);
+    \draw ([xshift=-5.5]Mux5.lpin 2) -- (Mux5.lpin 2) node[left, pos=0.5] {\tiny 4};
+    \draw (SE-out) node[right=4mm, above,magenta]  {\tiny{[31:0]}} -- ++ (6em,0em) |- (Mux5.lpin 3) ;
+
+    \node[draw, circle, radius=0.3em] at ([xshift=7.5em, yshift=0em]SE-out) (cir4) {\tiny{$>>2$}};
+    \draw (SE-out) |- (cir4.west);
+    \draw (cir4.north) |- (Mux5.lpin 4);
+
+    \node[muxdemux myALU] at ([xshift=20em, yshift=2em]RF) (ALUunit) {\rotatebox{90} {ALU}};
+
+    \draw (Mux4.rpin 1) -- ++ (2em,0em) |- (ALUunit.lpin 1) node[left=1.5mm, above,magenta]  {\tiny{SrcA}};
+    \draw (Mux5.rpin 1) -- ++ (1em,0em) |- (ALUunit.lpin 2) node[left=1.5mm, above,magenta]  {\tiny{SrcA}};
+
+    \node[flipflop myLatchNoen] at ([xshift=6em]ALUunit) (ALUoutFF) {};
+    \node[below=1mm] at (ALUoutFF.south) {\tiny{CLK}};
+    \draw (ALUunit.rpin 1) -- (ALUoutFF.bpin 2);
+
+    \node[muxdemux mux4x1] at ([xshift=6.5em, yshift=0.8em]ALUoutFF) (ALUMuxout) {};
+    \node[right, font=\tiny] at ([xshift=0.5em]ALUMuxout.lpin 1) {00};
+    \node[right, font=\tiny] at ([xshift=0.5em]ALUMuxout.lpin 2) {01};
+    \node[right, font=\tiny] at ([xshift=0.5em]ALUMuxout.lpin 3) {10};
+    \node[right, font=\tiny] at ([xshift=0.5em]ALUMuxout.lpin 4) {11};
+
+    \draw (ALUoutFF.bpin 5)   -- ++ (1.25em,0) |- node[left=1mm, above=0mm,magenta]  {\tiny{ALUOut}} (ALUMuxout.lpin 2)  ;
+
+    \draw ([xshift=0.75em]ALUunit.rpin 1) node[right=1mm, above,magenta]  {\tiny{ALUResult}} |- (ALUMuxout.lpin 1);
+
+
+
+
+    % feedback
+
+    \draw (ALUMuxout.rpin 1) -- ++ (0em,-18em) -| ([xshift=-0.4em]PCFF.bpin 2);
+
+    \draw ([xshift=1.25em]ALUoutFF.bpin 5) -- ++ (0em,-16em) -| (Mux1.lpin 2);
+
+    \draw ([xshift=1.25em]ALUoutFF.bpin 5) -- ++ (0em,-16em) -| (Mux3.lpin 2);
+
+    \draw ([xshift=1.25em]Bout.bpin 5) -- ++ (0em,-8.5em) -| ([xshift=-0.8em]Memory.bpin 3);
+
+
+
+    \draw ([xshift=-1.25em]Mux1.lpin 1) -- ++ (0em,10em) -| (Mux4.lpin 1);
+
+
+
+
+
+    % branch parth
+
+    \node[american and port, scale=0.5, rotate=270] at ([xshift=0.4em,yshift=-7em]ALUunit) (and1){};
+
+    \draw (ALUunit.bpin 1) -- (and1.in 2);
+
+    \node[american or port, scale=0.5, rotate=270] at ([xshift=0.8em,yshift=-10em]ALUunit) (or1){};
+
+    \draw (and1.out) -- (or1.in 2);
+
+
+    \draw[blue] (or1.out) -- ++ (0em,-5em) -| (PCFF.south);
+
+    \node[blue, right] at (or1.out) {\tiny PCEn};
+
+
+
+    % control unit starts
+
+    \draw ([xshift=-10em, yshift=10em]RF) node[dipchip,
+        blue,
+        rounded corners,
+        scale =0.5,
+        text width=1cm,
+        num pins=14, hide numbers, no topmark,
+        external pins width=0](C){\small Conrol\\ Unit};
+
+    \draw (C.n) ++(-0.1,0) -- ++(0.1,-0.1) -- ++(0.1,0.1);
+    \draw (C.n) -- ++(0,0.25) coordinate(clkPin) node[above,pos=1, font=\tiny]{\textcolor{blue}{CLK}};
+
+
+
+    \draw (C.bpin 1) -- ++(-0.1,0) coordinate(CUpin1);
+    \draw (C.bpin 2) -- ++(-0.1,0) coordinate(CUpin2);
+    \draw (C.bpin 3) -- ++(-0.1,0) coordinate(CUpin3);
+    \draw (C.bpin 7) -- ++(-0.1,0) coordinate(CUpin4);
+
+    \draw (C.bpin 8) -- ++(0.1,0) coordinate(CUpin11);
+    \draw (C.bpin 9) -- ++(0.1,0) coordinate(CUpin10);
+    \draw (C.bpin 10) -- ++(0.1,0) coordinate(CUpin9);
+    \draw (C.bpin 11) -- ++(0.1,0) coordinate(CUpin8);
+    \draw (C.bpin 12) -- ++(0.1,0) coordinate(CUpin7);
+    \draw (C.bpin 13) -- ++(0.1,0) coordinate(CUpin6);
+    \draw (C.bpin 14) -- ++(0.1,0) coordinate(CUpin5);
+
+
+    % control unit ends
+
+    \draw (IRFF.bpin 5) -- ++ (5.8em,0) |- (CUpin4);
+
+    \draw[blue] (CUpin1) -| (Mux1.tpin 1);
+    \node[blue, above] at ([xshift=-0.6em]CUpin1) {\tiny IorD};
+
+    \draw[blue] (CUpin2) -| (Memory.north);
+    \node[blue, above] at ([xshift=-1.5em]CUpin2) {\tiny MemWrite};
+
+
+    \draw[blue] (CUpin3) -| (IRFF.north);
+    \node[blue, above] at ([xshift=-1.2em]CUpin3) {\tiny IRWrite};
+
+
+    \draw[blue] (CUpin5) -- ++ (40.2em,0)  |- (ALUMuxout.tpin 1);
+    \node[blue, above] at ([xshift=1em]CUpin5) {\tiny PCSrc\textsubscript{1:0}};
+
+    \draw[blue] (CUpin6) -- ++ (30.7em,0) |- (or1.in 1);
+    \node[blue, above] at ([xshift=1.2em]CUpin6) {\tiny PCWrite};
+
+
+    \draw[blue] (CUpin7) -- ++ (30em,0) |- (and1.in 1);
+    \node[blue, above] at ([xshift=1em]CUpin7) {\tiny Branch};
+
+
+    \draw[blue] (CUpin8) -- ++ (27.73em,0) |- (ALUunit.tpin 1);
+    \node[blue, above] at ([xshift=2.2em]CUpin8) {\tiny ALUControl\textsubscript{2:0}};
+
+    \draw[blue] (CUpin9) -- ++ (24em,0) |- (Mux5.tpin 1);
+    \node[blue, above] at ([xshift=1.8em]CUpin9) {\tiny ALUSrcB\textsubscript{1:0}};
+
+    \draw[blue] (CUpin10) -- ++ (20.63em,0) |- (Mux4.tpin 1);
+    \node[blue, above] at ([xshift=1.8em]CUpin10) {\tiny ALUSrcA\textsubscript{1:0}};
+
+    \draw[blue] (CUpin11) -- ++ (7.73em,0)  |- (RF.north);
+    \node[blue, above] at ([xshift=1.4em]CUpin11) {\tiny RegWrite};
+
+
+
+    \draw[blue] ([xshift=-1.4em]C.south) -- (Mux2.tpin 1);
+    \node[blue, right] at ([xshift=-1.4em, yshift=-1.2em]C.south)  {\rotatebox{-90}{\tiny RegDst}};
+
+    \draw[blue] ([xshift=0.6em]C.south) -- (Mux3.tpin 1);
+    \node[blue, right] at ([xshift=0.6em, yshift=-1.7em]C.south)  {\rotatebox{-90}{\tiny MemtoReg}};
+
+
+    % for multicylce 2
+
+    \node[draw, circle, radius=0.3em] at ([xshift=0.1em, yshift=-9em]ALUMuxout.south) (cir42) {\tiny{$>>2$}};
+    \node[draw, rectangle, minimum size=5mm] at ([xshift=-2.7em, yshift=-5em]ALUMuxout.south) (rect1) {\tiny{concat}};
+
+    \draw ([xshift=-1.25em]Mux1.lpin 1) -- ++ (0em,-17em) -| (cir42.south) node[below,magenta]  {\tiny{[25:0]}};
+
+    \draw ([xshift=5.8em]IRFF.bpin 5) -- ++ (0em,-15em) -| ([xshift=-0.2em]rect1.south) node[below,magenta]  {\tiny{[31:28]}};
+
+    \draw (cir42.north) |- (rect1.east) node[above=1mm, right,magenta]  {\tiny{[27:0]}};
+
+
+    \draw (rect1.north) node[right, above=3mm,magenta]  {\tiny{PCJump}} |- (ALUMuxout.lpin 3);
+
+    % for multicylce_newones 2
+
+
+    \draw ([xshift=5.8em]IRFF.bpin 5) -- ++ (0em,2em) -|   node[above left=0.8mm,magenta]  {\tiny{[10:6]}} ([xshift=-0.5em]Mux4.lpin 2) -- (Mux4.lpin 2);
+
+
+\end{circuitikz}
+
+
+
+
+\end{document}
