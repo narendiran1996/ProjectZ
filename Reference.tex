@@ -119,7 +119,7 @@
 \subsubsection*{State Diagram}
 \begin{figure}[H]
     \begin{center}
-        \includegraphics[scale=0.5]{MultiCycleImplementation/MIPsMulticylce_FSM.png}
+        \includegraphics[scale=1]{MultiCycleImplementation/TexFiles/SD1.pdf}
         \caption*{\textbf{Added a new dummy state for }\textit|beq|}
     \end{center}
 \end{figure}
@@ -146,10 +146,11 @@
 \subsubsection*{State Diagram}
 \begin{figure}[H]
     \begin{center}
-        \includegraphics[scale=0.5]{MultiCycleImplementation/MISPImplementationFSM_JUMP.png}
+        \includegraphics[scale=1]{MultiCycleImplementation/TexFiles/SD2.pdf}
         \caption*{\textbf{Added a new dummy state for }\textit|j|}
     \end{center}
 \end{figure}
+
 
 
 \subsection*{Project 3}
@@ -166,9 +167,11 @@
 \subsubsection*{State Diagram}
 \begin{figure}[H]
     \begin{center}
-        \includegraphics[scale=0.5]{MultiCycleImplementation/MISPImplementationFSM_JUMP.png}
+        \includegraphics[scale=0.8]{MultiCycleImplementation/TexFiles/SD3.pdf}
+        \caption*{\textbf{Added a new dummy state for }\textit|addi|}
     \end{center}
 \end{figure}
+
 
 
 \subsection*{References}
@@ -193,6 +196,13 @@
         \caption*{Changed ALUsrc A Mux}
     \end{center}
 \end{figure}
+\subsubsection*{State Diagram}
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[scale=0.8]{MultiCycleImplementation_NewOnes/TexFiles/SD2.pdf}
+        \caption*{\textbf{Added support for addi, and ori,sll, srl}}
+    \end{center}
+\end{figure}
 \begin{itemize}
     \item Modified controller FSM add immediate to general immediate.
     \item Modified DataPath to have shfit based operation (ALU is included with shift operations with operand reversed).
@@ -200,6 +210,7 @@
     \item Modified controller FSM to incorporate shift operation with R type instruction.
     \item Added support for "addi, andi, ori, sll and srl".
 \end{itemize}
+
 
 \subsection*{Project 3}
 \begin{figure}[H]
@@ -212,5 +223,47 @@
     \item Modified Data Path to incorporate "bne" by adding Branch\_neq signal form controller and AND with $\overline{isZero}$ which is ORred with PCWrite.
     \item Modifed FSM to have both "beq" and "bne" in same \verb|BRANCH| state.
 \end{itemize}
+
+
+
+
+\section*{MultiCycleImplementation\_NewOnes2}
+\subsection*{Project 1}
+\begin{itemize}
+    \item Added support for "jr"
+    \item By modifiying FSM to uses a state where one operator is the register rs, and other operator is 0 (see instructions) and code.
+    \item The address must be in 4 aligned.
+    \item Note: Also jr will jump to address +4 value.
+\end{itemize}
+
+\subsubsection*{State Diagram}
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[scale=0.7]{MultiCycleImplementation_NewOnes2/TexFiles/SD1.pdf}
+        \caption*{\textbf{Added support for jr}}
+    \end{center}
+\end{figure}
+
+
+\subsection*{Project 2}
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[scale=0.7]{MultiCycleImplementation_NewOnes2/TexFiles/MultiCycle_NewOnes2.pdf}
+        \caption*{Added support for jal}
+    \end{center}
+\end{figure}
+\begin{itemize}
+    \item Added support for "jal" -- stored pc+4 in \$ra and jump to the location.
+    \item Modified FSM to have extra states for jal
+    \item Modifed DataPath by changing the write register mux to 4x1.
+\end{itemize}
+
+\subsubsection*{State Diagram}
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[scale=0.7]{MultiCycleImplementation_NewOnes2/TexFiles/SD2.pdf}
+        \caption*{\textbf{Added support for jal}}
+    \end{center}
+\end{figure}
 
 \end{document}
