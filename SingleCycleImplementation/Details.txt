@@ -1,0 +1,8 @@
+Instructions:
+lw, sw, add, sub, AND, OR, slt, beq, j
+
+Single clock cyle
+
+Edge-Triggered Clocking Mechanism
+\itm
+
