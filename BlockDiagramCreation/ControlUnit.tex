@@ -1,0 +1,42 @@
+\documentclass{standalone}
+
+\usepackage[siunitx, RPvoltages]{circuitikz}
+\usepackage{tikz}
+\usepackage{xcolor}
+
+\begin{document}
+
+\begin{circuitikz}
+    \ctikzset{multipoles/thickness=3}
+    \ctikzset{multipoles/dipchip/width=1}
+    \draw (0,0) node[dipchip,
+        blue,
+        rounded corners,
+        scale =1,
+        text width=1cm,
+        num pins=14, hide numbers, no topmark,
+        external pins width=0](C){\small Conrol\\ Unit};
+
+    \draw (C.n) ++(-0.1,0) -- ++(0.1,-0.1) -- ++(0.1,0.1);
+    \draw (C.n) -- ++(0,0.25) coordinate(clkPin) node[above,pos=1, font=\tiny]{\textcolor{blue}{CLK}};
+
+
+
+    \draw (C.bpin 1) -- ++(-0.5,0) coordinate(CUpin1);
+    \draw (C.bpin 2) -- ++(-0.5,0) coordinate(CUpin2);
+    \draw (C.bpin 3) -- ++(-0.5,0) coordinate(CUpin3);
+    \draw (C.bpin 7) -- ++(-0.5,0) coordinate(CUpin4);
+
+    \draw (C.bpin 8) -- ++(0.5,0) coordinate(CUpin11);
+    \draw (C.bpin 9) -- ++(0.5,0) coordinate(CUpin10);
+    \draw (C.bpin 10) -- ++(0.5,0) coordinate(CUpin9);
+    \draw (C.bpin 11) -- ++(0.5,0) coordinate(CUpin8);
+    \draw (C.bpin 12) -- ++(0.5,0) coordinate(CUpin7);
+    \draw (C.bpin 13) -- ++(0.5,0) coordinate(CUpin6);
+    \draw (C.bpin 14) -- ++(0.5,0) coordinate(CUpin5);
+
+
+
+\end{circuitikz}
+
+\end{document}

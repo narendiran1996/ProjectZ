@@ -1,0 +1,38 @@
+\documentclass{standalone}
+
+\usepackage[siunitx, RPvoltages]{circuitikz}
+\usepackage{tikz}
+
+\begin{document}
+
+\begin{circuitikz}
+    \ctikzset{multipoles/thickness=3}
+    \ctikzset{multipoles/dipchip/width=2}
+    \draw (0,0) node[dipchip,
+        scale =1.5,
+        num pins=12, hide numbers, no topmark,
+        external pins width=0](C){\small Register File};
+
+    \node [right, font=\tiny] at (C.bpin 1) {RD\_addr1};
+    \node [right, font=\tiny] at (C.bpin 2) {RD\_addr2};
+    \node [right, font=\tiny] at (C.bpin 3) {WR\_addr3};
+    \draw (C.bpin 1) -- ++(-0.5,0) coordinate(extpin1);
+    \draw (C.bpin 2) -- ++(-0.5,0) coordinate(extpin2);
+    \draw (C.bpin 3) -- ++(-0.5,0) coordinate(extpin3);
+    \draw (C.bpin 5) -- ++(-0.5,0) coordinate(extpin4);
+    \draw (C.bpin 6) -- ++(-0.5,0) coordinate(extpin5);
+    
+    \draw (C.bpin 5) ++(0,0.1) -- ++(0.1,-0.1)
+    node[right, font=\tiny]{CLK} -- ++(-0.1,-0.1);
+    \node [right, font=\tiny] at (C.bpin 6) {WR\_data};
+
+    \draw (C.n) -- ++(0,0.5) node[below, pos=0] {\tiny{EN}};
+
+    \node [left, font=\tiny] at (C.bpin 12) {RD\_data1};
+    \node [left, font=\tiny] at (C.bpin 11) {RD\_data2};
+
+    \draw (C.bpin 12) -- ++(0.5,0) coordinate(extpin6);
+    \draw (C.bpin 11) -- ++(0.5,0) coordinate(extpin7);
+\end{circuitikz}
+
+\end{document}
